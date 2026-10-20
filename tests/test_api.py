@@ -53,6 +53,22 @@ def test_ui_evaluation(client):
     assert "<html" in response.text.lower()
 
 
+def test_api_evaluation_latest(client):
+    response = client.get("/api/evaluation/latest")
+    assert response.status_code == 200
+    data = response.json()
+    assert "metrics" in data
+    assert "examples" in data
+    assert "run_info" in data
+    assert len(data["metrics"]) >= 5
+
+
+def test_api_evaluation_runs(client):
+    response = client.get("/api/evaluation/runs")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
 def test_api_houses_list(client):
     response = client.get("/api/houses/")
     assert response.status_code == 200
