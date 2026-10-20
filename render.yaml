@@ -31,5 +31,7 @@ services:
 
 databases:
   - name: kikulog-db
+    databaseName: kikulog
+    user: kikulog_user
     region: singapore
     plan: free
