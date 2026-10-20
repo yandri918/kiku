@@ -136,12 +136,60 @@ class EvaluationRun(Base):
 # DB init
 # ---------------------------------------------------------------------------
 
+async def seed_initial_data():
+    from datetime import date, timedelta
+    from sqlalchemy import select
+
+    async with async_session_factory() as session:
+        result = await session.execute(select(House))
+        if result.scalars().first() is None:
+            today = date.today()
+            h1 = House(
+                display_name="House 1",
+                aliases=["house 1", "house_1", "h1", "1", "satu", "a", "house a"],
+                is_active=True,
+            )
+            h2 = House(
+                display_name="House 2",
+                aliases=["house 2", "house_2", "h2", "2", "dua", "b", "house b"],
+                is_active=True,
+            )
+            h3 = House(
+                display_name="House 3",
+                aliases=["house 3", "house_3", "h3", "3", "tiga", "c", "house c"],
+                is_active=True,
+            )
+            session.add_all([h1, h2, h3])
+            await session.flush()
+
+            # Synthetic active cycles from demo script:
+            # House 1: ~18 days after planting
+            # House 2: ~14 days after planting
+            cycle1 = CropCycle(
+                house_id=h1.id,
+                planting_date=today - timedelta(days=18),
+                status="active",
+                variety="Seiko",
+            )
+            cycle2 = CropCycle(
+                house_id=h2.id,
+                planting_date=today - timedelta(days=14),
+                status="active",
+                variety="Iwa",
+            )
+            session.add_all([cycle1, cycle2])
+            await session.commit()
+            logger.info("Seeded initial synthetic houses and active cycles.")
+
+
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database schema verified.")
+    await seed_initial_data()
 
 
 async def get_session() -> AsyncSession:
     async with async_session_factory() as session:
         yield session
+
