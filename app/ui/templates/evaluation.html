@@ -23,60 +23,114 @@
 
   <main class="main" id="main-content">
     <header class="page-header">
-      <h1 class="page-title">Evaluation</h1>
+      <h1 class="page-title">Model Evaluation</h1>
       <p class="page-subtitle">
-        Baseline vs. fine-tuned model on the same locked test set.
-        Scores reflect real measurements, not estimates.
+        Performance comparison between the standard baseline model and the farm-tuned model on real chrysanthemum work notes.
       </p>
     </header>
 
+    <!-- Metrics comparison table -->
     <section class="section" aria-labelledby="metrics-heading">
-      <h2 class="section-title" id="metrics-heading">Metrics Comparison</h2>
+      <h2 class="section-title" id="metrics-heading">Accuracy & Performance Comparison</h2>
       <div class="table-wrapper">
         <table class="metrics-table" id="metrics-table">
           <thead>
             <tr>
-              <th scope="col">Metric</th>
-              <th scope="col">Baseline</th>
-              <th scope="col">Fine-tuned</th>
-              <th scope="col">Change</th>
+              <th scope="col">Evaluation Metric</th>
+              <th scope="col">Standard Baseline</th>
+              <th scope="col">Fine-Tuned Model</th>
+              <th scope="col">Improvement</th>
             </tr>
           </thead>
           <tbody id="metrics-body">
-            <tr><td colspan="4" class="empty-state">No evaluation runs recorded yet.</td></tr>
+            <tr><td colspan="4" class="empty-state">Loading evaluation data...</td></tr>
           </tbody>
         </table>
       </div>
       <p class="table-note">
-        Scores are reported with numerator/denominator where sample size is small.
-        A single score change is not treated as a definitive improvement without reviewing error patterns.
+        Evaluated on the locked test set. Event Exact Match requires exact recognition of house, activity code, and work status without hallucinations.
       </p>
     </section>
 
+    <!-- Visual Example comparisons -->
     <section class="section" aria-labelledby="examples-heading">
-      <h2 class="section-title" id="examples-heading">Example Predictions</h2>
+      <h2 class="section-title" id="examples-heading">Side-by-Side Note Extractions</h2>
       <p class="section-description">
-        The same test input is shown for both models. Errors are included alongside successes.
+        Compare how both models interpret informal work notes from the farm.
       </p>
       <div class="example-list" id="example-list">
-        <p class="empty-state">No examples available yet.</p>
+        <p class="empty-state">Loading examples...</p>
       </div>
     </section>
 
+    <!-- Model & Test Information -->
     <section class="section" aria-labelledby="run-info-heading">
-      <h2 class="section-title" id="run-info-heading">Run Information</h2>
+      <h2 class="section-title" id="run-info-heading">Evaluation Overview</h2>
       <div class="run-details" id="run-details">
-        <p class="empty-state">No runs recorded.</p>
+        <p class="empty-state">Loading details...</p>
       </div>
     </section>
   </main>
 
-  <script src="/static/js/app.js?v=3"></script>
+  <script src="/static/js/app.js?v=4"></script>
   <script>
     (function () {
       function init() {
         const { API, activityLabel, statusBadge } = window.KikuLog || {};
         if (!API) return;
+
+        function renderEventCard(ev) {
+          const houseText = ev.house_id ? `House: <strong>${ev.house_id.replace('_', ' ').toUpperCase()}</strong>` : 'General / Shared task';
+          return `
+            <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-weight:600;font-size:0.9rem;">${activityLabel(ev.activity)}</span>
+                ${statusBadge(ev.status)}
+              </div>
+              <div style="font-size:0.8rem;color:var(--color-text-muted);">
+                ${houseText}
+              </div>
+              ${ev.evidence ? `<div style="font-size:0.75rem;color:var(--color-text-muted);font-style:italic;margin-top:4px;border-left:2px solid var(--color-border);padding-left:6px;">"${ev.evidence}"</div>` : ''}
+            </div>
+          `;
+        }
+
+        function renderModelSide(output, label, isFineTuned) {
+          const events = (output && output.events) || [];
+          const clarifications = (output && output.clarifications) || [];
+
+          let contentHtml = '';
+          if (events.length > 0) {
+            contentHtml += events.map(renderEventCard).join('');
+          }
+
+          if (clarifications.length > 0) {
+            contentHtml += `
+              <div style="background:rgba(226,168,75,0.08);border:1px solid rgba(226,168,75,0.25);border-radius:6px;padding:8px 10px;margin-top:6px;">
+                <div style="font-size:0.75rem;font-weight:600;color:var(--color-warning);margin-bottom:4px;">Requested Clarification:</div>
+                <div style="font-size:0.8rem;color:var(--color-text-muted);">${clarifications.join('<br>')}</div>
+              </div>
+            `;
+          }
+
+          if (!events.length && !clarifications.length) {
+            contentHtml = '<div style="font-size:0.85rem;color:var(--color-text-muted);font-style:italic;padding:8px 0;">No activities recognized.</div>';
+          }
+
+          const borderCol = isFineTuned ? 'rgba(74, 108, 247, 0.3)' : 'var(--color-border)';
+          const bgCol = isFineTuned ? 'rgba(74, 108, 247, 0.03)' : 'var(--color-surface-2)';
+          const labelCol = isFineTuned ? 'var(--color-accent)' : 'var(--color-text-muted)';
+
+          return `
+            <div style="background:${bgCol};border:1px solid ${borderCol};border-radius:8px;padding:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span style="font-size:0.85rem;font-weight:600;color:${labelCol};">${label}</span>
+                ${isFineTuned ? '<span class="badge badge-done" style="font-size:0.75rem;">Optimized</span>' : '<span class="badge badge-planned" style="font-size:0.75rem;">Default</span>'}
+              </div>
+              ${contentHtml}
+            </div>
+          `;
+        }
 
         async function loadEvaluation() {
           try {
@@ -94,67 +148,66 @@
 
                 return `
                   <tr style="${m.primary ? 'font-weight:600;background:rgba(255,255,255,0.02);' : ''}">
-                    <td>${m.metric} ${m.primary ? '<span style="font-size:0.75rem;color:var(--color-accent);">(Primary)</span>' : ''}</td>
+                    <td>
+                      ${m.metric}
+                      ${m.primary ? '<span style="font-size:0.75rem;color:var(--color-accent);margin-left:6px;font-weight:bold;">(Primary)</span>' : ''}
+                    </td>
                     <td>${m.baseline}</td>
-                    <td>${m.finetuned}</td>
+                    <td><strong>${m.finetuned}</strong></td>
                     <td style="color:${color};font-weight:600;">${m.change}</td>
                   </tr>
                 `;
               }).join('');
             }
 
-            // 2. Populate Example Predictions
+            // 2. Populate Human-Readable Example Predictions
             const exampleList = document.getElementById('example-list');
             if (exampleList && data.examples && data.examples.length) {
               exampleList.innerHTML = data.examples.map((ex, i) => `
-                <div class="card" style="margin-bottom:16px;">
-                  <div style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;">
-                    Example ${i + 1}
+                <div class="card" style="margin-bottom:20px;border:1px solid var(--color-border);padding:20px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <span style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);font-weight:600;">Scenario #${i + 1}</span>
                   </div>
-                  <div style="font-size:1rem;font-weight:500;margin-bottom:12px;background:var(--color-bg);padding:10px;border-radius:6px;">
+                  <div style="font-size:1.05rem;font-weight:500;margin-bottom:16px;background:var(--color-bg);border:1px solid var(--color-border);padding:12px 16px;border-radius:6px;line-height:1.4;">
                     "${ex.input}"
                   </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;">
-                      <div style="font-size:0.8rem;font-weight:600;color:var(--color-text-muted);margin-bottom:6px;">
-                        Baseline Model
-                      </div>
-                      <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;color:var(--color-text-muted);">${JSON.stringify(ex.baseline_output, null, 2)}</pre>
-                    </div>
-                    <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;background:rgba(46,133,64,0.04);">
-                      <div style="font-size:0.8rem;font-weight:600;color:var(--color-accent);margin-bottom:6px;">
-                        Fine-Tuned Checkpoint
-                      </div>
-                      <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;">${JSON.stringify(ex.finetuned_output, null, 2)}</pre>
-                    </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;">
+                    ${renderModelSide(ex.baseline_output, 'Standard Baseline (Zero-Shot)', false)}
+                    ${renderModelSide(ex.finetuned_output, 'Fine-Tuned Model (Tinker)', true)}
                   </div>
                 </div>
               `).join('');
             }
 
-            // 3. Populate Run Info
+            // 3. Populate Run Info cleanly without raw backend dumps
             const runDetails = document.getElementById('run-details');
             if (runDetails && data.run_info) {
               runDetails.innerHTML = `
-                <div class="card">
-                  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">
+                <div class="card" style="padding:20px;">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;">
                     <div>
-                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Base Model</div>
-                      <div style="font-weight:500;">${data.run_info.base_model}</div>
+                      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--color-text-muted);font-weight:600;margin-bottom:4px;">Base Architecture</div>
+                      <div style="font-size:0.95rem;font-weight:500;">${data.run_info.base_model}</div>
                     </div>
                     <div>
-                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Fine-Tuned Adapter</div>
-                      <div style="font-weight:500;">${data.run_info.finetuned_checkpoint}</div>
+                      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--color-text-muted);font-weight:600;margin-bottom:4px;">Training Strategy</div>
+                      <div style="font-size:0.95rem;font-weight:500;">${data.run_info.finetuned_checkpoint}</div>
                     </div>
                     <div>
-                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Test Set Hash</div>
-                      <div style="font-family:monospace;font-size:0.8rem;">${data.dataset_hash.substring(0, 16)}...</div>
+                      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--color-text-muted);font-weight:600;margin-bottom:4px;">Test Set Size</div>
+                      <div style="font-size:0.95rem;font-weight:500;">${data.test_set_size} verified chrysanthemum scenarios</div>
                     </div>
                     <div>
-                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Evaluated Date</div>
-                      <div style="font-weight:500;">${data.run_info.evaluated_at}</div>
+                      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--color-text-muted);font-weight:600;margin-bottom:4px;">Evaluation Date</div>
+                      <div style="font-size:0.95rem;font-weight:500;">${data.run_info.evaluated_at}</div>
                     </div>
                   </div>
+                  <details style="margin-top:16px;padding-top:12px;border-top:1px solid var(--color-border);font-size:0.8rem;color:var(--color-text-muted);">
+                    <summary style="cursor:pointer;font-weight:500;">View technical reproducibility hash</summary>
+                    <div style="margin-top:8px;font-family:monospace;background:var(--color-bg);padding:8px 12px;border-radius:4px;word-break:break-all;">
+                      SHA-256: ${data.dataset_hash}
+                    </div>
+                  </details>
                 </div>
               `;
             }
