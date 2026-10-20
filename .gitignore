@@ -10,6 +10,8 @@ __pycache__/
 venv/
 dist/
 build/
+*.db
+*.sqlite*
 
 # Data splits (generated — do not commit)
 training/data/

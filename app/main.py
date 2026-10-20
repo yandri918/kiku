@@ -14,7 +14,7 @@ from app.config import settings
 from app.persistence import init_db
 from app.routers import notes, houses, agenda, evaluation
 
-logging.basicConfig(level=settings.LOG_LEVEL)
+logging.basicConfig(level=settings.log_level)
 logger = logging.getLogger(__name__)
 
 
@@ -52,19 +52,19 @@ async def health():
 # --- UI routes ---
 @app.get("/", response_class=HTMLResponse, tags=["ui"])
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @app.get("/journal", response_class=HTMLResponse, tags=["ui"])
 async def journal(request: Request):
-    return templates.TemplateResponse("journal.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="journal.html")
 
 
 @app.get("/agenda", response_class=HTMLResponse, tags=["ui"])
 async def agenda_page(request: Request):
-    return templates.TemplateResponse("agenda.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="agenda.html")
 
 
 @app.get("/evaluation", response_class=HTMLResponse, tags=["ui"])
 async def evaluation_page(request: Request):
-    return templates.TemplateResponse("evaluation.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="evaluation.html")

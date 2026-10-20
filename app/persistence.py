@@ -8,9 +8,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean, Column, Date, DateTime, Enum, Float,
-    ForeignKey, Integer, JSON, String, Text, UniqueConstraint,
+    ForeignKey, Integer, JSON, String, Text, UniqueConstraint, Uuid,
 )
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, relationship
 import uuid
@@ -33,7 +32,7 @@ class Base(DeclarativeBase):
 
 class House(Base):
     __tablename__ = "houses"
-    id           = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id           = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     display_name = Column(String(100), nullable=False, unique=True)
     aliases      = Column(JSON, nullable=False, default=list)
     is_active    = Column(Boolean, nullable=False, default=True)
@@ -45,8 +44,8 @@ class House(Base):
 
 class CropCycle(Base):
     __tablename__ = "crop_cycles"
-    id            = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    house_id      = Column(PG_UUID(as_uuid=True), ForeignKey("houses.id"), nullable=False)
+    id            = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    house_id      = Column(Uuid(as_uuid=True), ForeignKey("houses.id"), nullable=False)
     planting_date = Column(Date, nullable=False)
     status        = Column(String(20), nullable=False, default="active")
     variety       = Column(String(100), nullable=True)
@@ -58,7 +57,7 @@ class CropCycle(Base):
 
 class RawNote(Base):
     __tablename__ = "raw_notes"
-    id           = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id           = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     text         = Column(Text, nullable=False)
     input_time   = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     working_date = Column(Date, nullable=True)
@@ -70,8 +69,8 @@ class RawNote(Base):
 
 class DraftExtraction(Base):
     __tablename__ = "draft_extractions"
-    id            = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    note_id       = Column(PG_UUID(as_uuid=True), ForeignKey("raw_notes.id"), nullable=False)
+    id            = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    note_id       = Column(Uuid(as_uuid=True), ForeignKey("raw_notes.id"), nullable=False)
     model_version = Column(String(200), nullable=False)
     result        = Column(JSON, nullable=False)          # raw ModelDraft dict
     clarifications = Column(JSON, nullable=False, default=list)
@@ -84,10 +83,10 @@ class DraftExtraction(Base):
 
 class WorkEvent(Base):
     __tablename__ = "work_events"
-    id            = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    cycle_id      = Column(PG_UUID(as_uuid=True), ForeignKey("crop_cycles.id"), nullable=True)
-    house_id      = Column(PG_UUID(as_uuid=True), ForeignKey("houses.id"), nullable=True)
-    draft_id      = Column(PG_UUID(as_uuid=True), ForeignKey("draft_extractions.id"), nullable=True)
+    id            = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    cycle_id      = Column(Uuid(as_uuid=True), ForeignKey("crop_cycles.id"), nullable=True)
+    house_id      = Column(Uuid(as_uuid=True), ForeignKey("houses.id"), nullable=True)
+    draft_id      = Column(Uuid(as_uuid=True), ForeignKey("draft_extractions.id"), nullable=True)
     activity      = Column(String(50), nullable=False)
     status        = Column(String(20), nullable=False)
     occurred_on   = Column(Date, nullable=True)
@@ -106,9 +105,9 @@ class WorkEvent(Base):
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
-    id         = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id         = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     entity     = Column(String(50), nullable=False)
-    entity_id  = Column(PG_UUID(as_uuid=True), nullable=False)
+    entity_id  = Column(Uuid(as_uuid=True), nullable=False)
     before     = Column(JSON, nullable=True)
     after      = Column(JSON, nullable=True)
     actor      = Column(String(100), nullable=True)
@@ -117,7 +116,7 @@ class AuditLog(Base):
 
 class EvaluationRun(Base):
     __tablename__ = "evaluation_runs"
-    id                    = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id                    = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     model_label           = Column(String(200), nullable=False)
     dataset_hash          = Column(String(64), nullable=False)
     config                = Column(JSON, nullable=False, default=dict)
