@@ -2,9 +2,12 @@
 title: KikuLog: The Sloth's Way to Manage Chrysanthemum Greenhouses with Open-Source AI
 published: false
 tags: devchallenge, hf26challenge, hacktoberfest, productivity
+cover_image: https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/cover_banner.jpg
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 3: Slow and Steady](https://dev.to/challenges/hacktoberfest-week3-2026-10-19)*
+
+![KikuLog Header Banner](https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/cover_banner.jpg)
 
 ## What I Built
 
@@ -28,12 +31,27 @@ With KikuLog, workers get to channel their inner sloth: they relax on the couch 
 - **Live Deployed App on Render:** [https://kiku-app.onrender.com](https://kiku-app.onrender.com) *(replace with your exact Render service URL)*
 - **Walkthrough Video Demo:** [Watch on YouTube / Loom](https://youtu.be/your-demo-video) *(insert your 90-120 second video link)*
 
-### Key Screens
+### Application Screenshots
 
-1. **Today Dashboard (`/`):** Real-time view of scheduled tasks, overdue tasks, and open milestone windows for every greenhouse.
-2. **Journal & Review (`/journal`):** Single-note input box where informal notes are parsed into draft events with evidence quotes, requiring a one-click confirmation before updating the database.
-3. **Agenda (`/agenda`):** 7-day forward schedule showing cutting cycles, fixed Tuesday/Thursday/Sunday packing dates, and one-click CSV export.
-4. **Evaluation (`/evaluation`):** Quantified impact scorecard proving a +25% accuracy improvement on farm-specific edge cases.
+#### 1. Today Dashboard (`/`)
+Real-time view of scheduled tasks, overdue tasks, and open milestone windows for every greenhouse.
+
+![Today Dashboard](https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/today_dashboard.png)
+
+#### 2. Journal & AI Draft Review (`/journal`)
+Single-note input box where informal notes are parsed into draft events with evidence quotes, requiring a one-click confirmation before updating the database.
+
+![Journal Draft Review](https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/journal_extracted_draft.png)
+
+#### 3. Agenda & Packing Calendar (`/agenda`)
+7-day forward schedule showing cutting cycles, fixed Tuesday/Thursday/Sunday packing dates, and one-click CSV export.
+
+![Agenda 7-Day Schedule](https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/agenda_schedule.png)
+
+#### 4. Model Evaluation (`/evaluation`)
+Quantified impact scorecard proving a +25% accuracy improvement on farm-specific edge cases with verified scenario walkthroughs.
+
+![Model Performance Scorecard](https://raw.githubusercontent.com/yandri918/kiku/main/docs/images/evaluation_scorecard.png)
 
 ---
 
