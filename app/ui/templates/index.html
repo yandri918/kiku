@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KikuLog — Today</title>
+  <meta name="description" content="Work journal and schedule assistant for chrysanthemum farm workers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <nav class="nav" id="main-nav">
+    <a href="/" class="nav-logo" aria-label="KikuLog home">KikuLog</a>
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link active" aria-current="page">Today</a></li>
+      <li><a href="/journal" class="nav-link">Journal</a></li>
+      <li><a href="/agenda" class="nav-link">Agenda</a></li>
+      <li><a href="/evaluation" class="nav-link">Evaluation</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="main-content">
+    <header class="page-header">
+      <h1 class="page-title">Today</h1>
+      <p class="page-subtitle" id="today-date"></p>
+    </header>
+
+    <section class="section" aria-labelledby="scheduled-heading">
+      <h2 class="section-title" id="scheduled-heading">Scheduled Tasks</h2>
+      <div class="task-list" id="scheduled-tasks">
+        <p class="empty-state">Loading tasks...</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="overdue-heading">
+      <h2 class="section-title" id="overdue-heading">Overdue</h2>
+      <div class="task-list" id="overdue-tasks">
+        <p class="empty-state">No overdue tasks.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="windows-heading">
+      <h2 class="section-title" id="windows-heading">Open Windows</h2>
+      <p class="section-description">Tasks with a date range that includes today.</p>
+      <div class="task-list" id="window-tasks">
+        <p class="empty-state">No open windows today.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    document.getElementById('today-date').textContent =
+      new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  </script>
+</body>
+</html>

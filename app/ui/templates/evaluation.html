@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KikuLog — Evaluation</title>
+  <meta name="description" content="Compare baseline and fine-tuned model performance on the chrysanthemum work note extraction task." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <nav class="nav" id="main-nav">
+    <a href="/" class="nav-logo" aria-label="KikuLog home">KikuLog</a>
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link">Today</a></li>
+      <li><a href="/journal" class="nav-link">Journal</a></li>
+      <li><a href="/agenda" class="nav-link">Agenda</a></li>
+      <li><a href="/evaluation" class="nav-link active" aria-current="page">Evaluation</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="main-content">
+    <header class="page-header">
+      <h1 class="page-title">Evaluation</h1>
+      <p class="page-subtitle">
+        Baseline vs. fine-tuned model on the same locked test set.
+        Scores reflect real measurements, not estimates.
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="metrics-heading">
+      <h2 class="section-title" id="metrics-heading">Metrics Comparison</h2>
+      <div class="table-wrapper">
+        <table class="metrics-table" id="metrics-table">
+          <thead>
+            <tr>
+              <th scope="col">Metric</th>
+              <th scope="col">Baseline</th>
+              <th scope="col">Fine-tuned</th>
+              <th scope="col">Change</th>
+            </tr>
+          </thead>
+          <tbody id="metrics-body">
+            <tr><td colspan="4" class="empty-state">No evaluation runs recorded yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">
+        Scores are reported with numerator/denominator where sample size is small.
+        A single score change is not treated as a definitive improvement without reviewing error patterns.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="examples-heading">
+      <h2 class="section-title" id="examples-heading">Example Predictions</h2>
+      <p class="section-description">
+        The same test input is shown for both models. Errors are included alongside successes.
+      </p>
+      <div class="example-list" id="example-list">
+        <p class="empty-state">No examples available yet.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="run-info-heading">
+      <h2 class="section-title" id="run-info-heading">Run Information</h2>
+      <div class="run-details" id="run-details">
+        <p class="empty-state">No runs recorded.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

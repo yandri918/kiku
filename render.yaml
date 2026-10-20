@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: kikulog
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kikulog-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TINKER_API_KEY
+        sync: false
+      - key: TINKER_MODEL_ID
+        sync: false
+      - key: TINKER_ENDPOINT
+        value: https://api.thinkingmachines.ai/tinker/v1
+      - key: MODEL_TIMEOUT_SECONDS
+        value: 30
+      - key: DEMO_MODE
+        value: false
+      - key: WORK_TIMEZONE
+        value: Asia/Tokyo
+      - key: LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: kikulog-db
+    region: singapore
+    plan: free

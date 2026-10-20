@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KikuLog — Agenda</title>
+  <meta name="description" content="Combined work schedule across all houses and crop cycles." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <nav class="nav" id="main-nav">
+    <a href="/" class="nav-logo" aria-label="KikuLog home">KikuLog</a>
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link">Today</a></li>
+      <li><a href="/journal" class="nav-link">Journal</a></li>
+      <li><a href="/agenda" class="nav-link active" aria-current="page">Agenda</a></li>
+      <li><a href="/evaluation" class="nav-link">Evaluation</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="main-content">
+    <header class="page-header">
+      <h1 class="page-title">Agenda</h1>
+      <p class="page-subtitle">Combined schedule for all houses. Cutting and packing are shown together with field work.</p>
+      <div class="header-actions">
+        <a class="btn btn-ghost" href="/api/agenda/export/csv" id="export-csv-btn">Export CSV</a>
+      </div>
+    </header>
+
+    <section class="section" aria-labelledby="upcoming-heading">
+      <h2 class="section-title" id="upcoming-heading">Upcoming Tasks</h2>
+      <div class="agenda-grid" id="agenda-grid">
+        <p class="empty-state">Loading agenda...</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="packing-heading">
+      <h2 class="section-title" id="packing-heading">Packing Schedule</h2>
+      <p class="section-description">Fixed weekly series: Tuesday, Thursday, Sunday. Does not shift when the cutting schedule changes.</p>
+      <div class="task-list" id="packing-list">
+        <p class="empty-state">Loading packing schedule...</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KikuLog — Journal</title>
+  <meta name="description" content="Enter work notes and review AI-extracted events before saving." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+  <nav class="nav" id="main-nav">
+    <a href="/" class="nav-logo" aria-label="KikuLog home">KikuLog</a>
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link">Today</a></li>
+      <li><a href="/journal" class="nav-link active" aria-current="page">Journal</a></li>
+      <li><a href="/agenda" class="nav-link">Agenda</a></li>
+      <li><a href="/evaluation" class="nav-link">Evaluation</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="main-content">
+    <header class="page-header">
+      <h1 class="page-title">Journal</h1>
+      <p class="page-subtitle">Enter a note. Review the draft. Approve to save.</p>
+    </header>
+
+    <!-- Note input -->
+    <section class="section" aria-labelledby="note-input-heading">
+      <h2 class="section-title" id="note-input-heading">New Note</h2>
+      <form class="note-form" id="note-form" novalidate>
+        <div class="form-row">
+          <label class="form-label" for="note-date">Working date</label>
+          <input class="form-input" type="date" id="note-date" name="working_date" required />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="note-text">Note</label>
+          <textarea
+            class="form-textarea"
+            id="note-text"
+            name="text"
+            rows="4"
+            maxlength="4000"
+            placeholder="e.g. House 3 cleared, net removed, stakes not yet done."
+            required
+          ></textarea>
+          <span class="char-count" id="char-count">0 / 4000</span>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" id="submit-note-btn">Extract Draft</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Draft review -->
+    <section class="section" id="draft-section" aria-labelledby="draft-heading" hidden>
+      <h2 class="section-title" id="draft-heading">Review Draft</h2>
+      <p class="section-description">
+        The model has extracted the following events. Each item shows the source evidence.
+        Correct or remove entries before saving.
+      </p>
+
+      <div class="clarification-box" id="clarification-box" hidden>
+        <p class="clarification-title">Clarification needed</p>
+        <ul class="clarification-list" id="clarification-list"></ul>
+      </div>
+
+      <div class="draft-events" id="draft-events"></div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="button" id="approve-btn">Save Approved Events</button>
+        <button class="btn btn-ghost" type="button" id="discard-btn">Discard Draft</button>
+      </div>
+    </section>
+
+    <!-- House journal -->
+    <section class="section" aria-labelledby="history-heading">
+      <h2 class="section-title" id="history-heading">House Journal</h2>
+      <div class="filter-row">
+        <label class="form-label" for="house-filter">House</label>
+        <select class="form-select" id="house-filter">
+          <option value="">All houses</option>
+        </select>
+      </div>
+      <div class="event-list" id="event-list">
+        <p class="empty-state">No events saved yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/journal.js"></script>
+</body>
+</html>

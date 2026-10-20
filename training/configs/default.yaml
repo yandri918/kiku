@@ -1,0 +1,29 @@
+# Default SFT configuration
+# Verify all values against current Tinker documentation before running.
+# Do not treat these as confirmed defaults.
+
+# Base model
+# List available models in your Tinker account before setting this.
+base_model: null  # e.g. "llama3-8b" — confirm availability first
+
+# Data
+train_file: training/data/train.jsonl
+val_file:   training/data/validation.jsonl
+# test_file is intentionally omitted here; run evaluation/run_eval.py separately
+
+# LoRA parameters — verify Tinker-supported ranges
+lora_rank:       8
+lora_alpha:      16
+lora_dropout:    0.05
+target_modules: null  # leave null to use Tinker defaults
+
+# Training
+learning_rate: 0.0002
+num_epochs:    3
+batch_size:    4
+warmup_steps:  50
+seed:          42
+
+# Checkpoint sampling
+checkpoint_every_n_steps: 50   # adjust based on dataset size
+max_checkpoints_to_keep:  5
