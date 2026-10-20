@@ -46,70 +46,88 @@
     </section>
   </main>
 
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.js?v=3"></script>
   <script>
-    const { API, activityLabel, statusBadge, formatDate } = window.KikuLog;
+    (function () {
+      function init() {
+        const { API, activityLabel, statusBadge, formatDate } = window.KikuLog || {};
+        if (!API) return;
 
-    async function loadAgenda() {
-      try {
-        const [todayTasks, upcoming] = await Promise.all([
-          API.get('/api/agenda/today'),
-          API.get('/api/agenda/upcoming'),
-        ]);
+        async function loadAgenda() {
+          const grid = document.getElementById('agenda-grid');
+          const packingList = document.getElementById('packing-list');
 
-        // 1. Render upcoming tasks grid
-        const grid = document.getElementById('agenda-grid');
-        if (!todayTasks.length) {
-          grid.innerHTML = '<p class="empty-state">No scheduled tasks at this time.</p>';
-        } else {
-          grid.innerHTML = todayTasks.map(t => {
-            const dateStr = t.window_start === t.window_end
-              ? formatDate(t.window_start)
-              : `${formatDate(t.window_start)} – ${formatDate(t.window_end)}`;
+          try {
+            const [todayTasks, upcoming] = await Promise.all([
+              API.get('/api/agenda/today'),
+              API.get('/api/agenda/upcoming'),
+            ]);
 
-            return `
-              <div class="card">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                  <span style="font-weight:600;font-size:0.95rem;">${t.house_name}</span>
-                  ${statusBadge(t.status)}
-                </div>
-                <div style="font-size:1.05rem;font-weight:600;margin-bottom:6px;">
-                  ${activityLabel(t.activity)}
-                </div>
-                <div style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:8px;">
-                  Due: ${dateStr}
-                </div>
-                <div style="font-size:0.75rem;color:var(--color-text-muted);background:var(--color-bg);padding:6px;border-radius:4px;">
-                  ${t.source}
-                </div>
-              </div>
-            `;
-          }).join('');
+            // 1. Render upcoming tasks grid
+            if (grid) {
+              if (!todayTasks.length) {
+                grid.innerHTML = '<p class="empty-state">No scheduled tasks at this time.</p>';
+              } else {
+                grid.innerHTML = todayTasks.map(t => {
+                  const dateStr = t.window_start === t.window_end
+                    ? formatDate(t.window_start)
+                    : `${formatDate(t.window_start)} – ${formatDate(t.window_end)}`;
+
+                  return `
+                    <div class="card">
+                      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                        <span style="font-weight:600;font-size:0.95rem;">${t.house_name}</span>
+                        ${statusBadge(t.status)}
+                      </div>
+                      <div style="font-size:1.05rem;font-weight:600;margin-bottom:6px;">
+                        ${activityLabel(t.activity)}
+                      </div>
+                      <div style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:8px;">
+                        Due: ${dateStr}
+                      </div>
+                      <div style="font-size:0.75rem;color:var(--color-text-muted);background:var(--color-bg);padding:6px;border-radius:4px;">
+                        ${t.source}
+                      </div>
+                    </div>
+                  `;
+                }).join('');
+              }
+            }
+
+            // 2. Render packing dates
+            if (packingList) {
+              if (upcoming.packing_dates && upcoming.packing_dates.length) {
+                packingList.innerHTML = upcoming.packing_dates.map(pd => `
+                  <div class="task-item">
+                    <div>
+                      <div class="task-activity">Packing Station</div>
+                      <div class="task-meta">${formatDate(pd)} &nbsp;|&nbsp; Fixed series (Tue / Thu / Sun)</div>
+                    </div>
+                    <span class="badge badge-planned">Scheduled</span>
+                  </div>
+                `).join('');
+              } else {
+                packingList.innerHTML = '<p class="empty-state">No packing dates scheduled.</p>';
+              }
+            }
+
+          } catch (err) {
+            if (grid) {
+              grid.innerHTML =
+                `<p class="empty-state" style="color:var(--color-danger);">Failed to load agenda: ${err.message}</p>`;
+            }
+          }
         }
 
-        // 2. Render packing dates
-        const packingList = document.getElementById('packing-list');
-        if (upcoming.packing_dates && upcoming.packing_dates.length) {
-          packingList.innerHTML = upcoming.packing_dates.map(pd => `
-            <div class="task-item">
-              <div>
-                <div class="task-activity">Packing Station</div>
-                <div class="task-meta">${formatDate(pd)} &nbsp;|&nbsp; Fixed series (Tue / Thu / Sun)</div>
-              </div>
-              <span class="badge badge-planned">Scheduled</span>
-            </div>
-          `).join('');
-        } else {
-          packingList.innerHTML = '<p class="empty-state">No packing dates scheduled.</p>';
-        }
-
-      } catch (err) {
-        document.getElementById('agenda-grid').innerHTML =
-          `<p class="empty-state" style="color:var(--color-danger);">Failed to load agenda: ${err.message}</p>`;
+        loadAgenda();
       }
-    }
 
-    loadAgenda();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
   </script>
 </body>
 </html>

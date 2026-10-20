@@ -71,98 +71,112 @@
     </section>
   </main>
 
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.js?v=3"></script>
   <script>
-    const { API, activityLabel, statusBadge } = window.KikuLog;
+    (function () {
+      function init() {
+        const { API, activityLabel, statusBadge } = window.KikuLog || {};
+        if (!API) return;
 
-    async function loadEvaluation() {
-      try {
-        const data = await API.get('/api/evaluation/latest');
+        async function loadEvaluation() {
+          try {
+            const data = await API.get('/api/evaluation/latest');
 
-        // 1. Populate Metrics Table
-        const tbody = document.getElementById('metrics-body');
-        if (data.metrics && data.metrics.length) {
-          tbody.innerHTML = data.metrics.map(m => {
-            const isPos = m.change.startsWith('+');
-            const isNeg = m.change.startsWith('-');
-            const color = m.metric.includes('Latency')
-              ? (isNeg ? 'var(--color-success)' : 'inherit')
-              : (isPos ? 'var(--color-success)' : 'inherit');
+            // 1. Populate Metrics Table
+            const tbody = document.getElementById('metrics-body');
+            if (tbody && data.metrics && data.metrics.length) {
+              tbody.innerHTML = data.metrics.map(m => {
+                const isPos = m.change.startsWith('+');
+                const isNeg = m.change.startsWith('-');
+                const color = m.metric.includes('Latency')
+                  ? (isNeg ? 'var(--color-success)' : 'inherit')
+                  : (isPos ? 'var(--color-success)' : 'inherit');
 
-            return `
-              <tr style="${m.primary ? 'font-weight:600;background:rgba(255,255,255,0.02);' : ''}">
-                <td>${m.metric} ${m.primary ? '<span style="font-size:0.75rem;color:var(--color-accent);">(Primary)</span>' : ''}</td>
-                <td>${m.baseline}</td>
-                <td>${m.finetuned}</td>
-                <td style="color:${color};font-weight:600;">${m.change}</td>
-              </tr>
-            `;
-          }).join('');
-        }
+                return `
+                  <tr style="${m.primary ? 'font-weight:600;background:rgba(255,255,255,0.02);' : ''}">
+                    <td>${m.metric} ${m.primary ? '<span style="font-size:0.75rem;color:var(--color-accent);">(Primary)</span>' : ''}</td>
+                    <td>${m.baseline}</td>
+                    <td>${m.finetuned}</td>
+                    <td style="color:${color};font-weight:600;">${m.change}</td>
+                  </tr>
+                `;
+              }).join('');
+            }
 
-        // 2. Populate Example Predictions
-        const exampleList = document.getElementById('example-list');
-        if (data.examples && data.examples.length) {
-          exampleList.innerHTML = data.examples.map((ex, i) => `
-            <div class="card" style="margin-bottom:16px;">
-              <div style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;">
-                Example ${i + 1}
-              </div>
-              <div style="font-size:1rem;font-weight:500;margin-bottom:12px;background:var(--color-bg);padding:10px;border-radius:6px;">
-                "${ex.input}"
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;">
-                  <div style="font-size:0.8rem;font-weight:600;color:var(--color-text-muted);margin-bottom:6px;">
-                    Baseline Model
+            // 2. Populate Example Predictions
+            const exampleList = document.getElementById('example-list');
+            if (exampleList && data.examples && data.examples.length) {
+              exampleList.innerHTML = data.examples.map((ex, i) => `
+                <div class="card" style="margin-bottom:16px;">
+                  <div style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;">
+                    Example ${i + 1}
                   </div>
-                  <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;color:var(--color-text-muted);">${JSON.stringify(ex.baseline_output, null, 2)}</pre>
-                </div>
-                <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;background:rgba(46,133,64,0.04);">
-                  <div style="font-size:0.8rem;font-weight:600;color:var(--color-accent);margin-bottom:6px;">
-                    Fine-Tuned Checkpoint
+                  <div style="font-size:1rem;font-weight:500;margin-bottom:12px;background:var(--color-bg);padding:10px;border-radius:6px;">
+                    "${ex.input}"
                   </div>
-                  <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;">${JSON.stringify(ex.finetuned_output, null, 2)}</pre>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;">
+                      <div style="font-size:0.8rem;font-weight:600;color:var(--color-text-muted);margin-bottom:6px;">
+                        Baseline Model
+                      </div>
+                      <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;color:var(--color-text-muted);">${JSON.stringify(ex.baseline_output, null, 2)}</pre>
+                    </div>
+                    <div style="padding:10px;border:1px solid var(--color-border);border-radius:6px;background:rgba(46,133,64,0.04);">
+                      <div style="font-size:0.8rem;font-weight:600;color:var(--color-accent);margin-bottom:6px;">
+                        Fine-Tuned Checkpoint
+                      </div>
+                      <pre style="font-size:0.75rem;margin:0;white-space:pre-wrap;">${JSON.stringify(ex.finetuned_output, null, 2)}</pre>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          `).join('');
+              `).join('');
+            }
+
+            // 3. Populate Run Info
+            const runDetails = document.getElementById('run-details');
+            if (runDetails && data.run_info) {
+              runDetails.innerHTML = `
+                <div class="card">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">
+                    <div>
+                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Base Model</div>
+                      <div style="font-weight:500;">${data.run_info.base_model}</div>
+                    </div>
+                    <div>
+                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Fine-Tuned Adapter</div>
+                      <div style="font-weight:500;">${data.run_info.finetuned_checkpoint}</div>
+                    </div>
+                    <div>
+                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Test Set Hash</div>
+                      <div style="font-family:monospace;font-size:0.8rem;">${data.dataset_hash.substring(0, 16)}...</div>
+                    </div>
+                    <div>
+                      <div style="font-size:0.75rem;color:var(--color-text-muted);">Evaluated Date</div>
+                      <div style="font-weight:500;">${data.run_info.evaluated_at}</div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+
+          } catch (err) {
+            const tbody = document.getElementById('metrics-body');
+            if (tbody) {
+              tbody.innerHTML =
+                `<tr><td colspan="4" style="color:var(--color-danger);">Failed to load evaluation: ${err.message}</td></tr>`;
+            }
+          }
         }
 
-        // 3. Populate Run Info
-        const runDetails = document.getElementById('run-details');
-        if (data.run_info) {
-          runDetails.innerHTML = `
-            <div class="card">
-              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;">
-                <div>
-                  <div style="font-size:0.75rem;color:var(--color-text-muted);">Base Model</div>
-                  <div style="font-weight:500;">${data.run_info.base_model}</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem;color:var(--color-text-muted);">Fine-Tuned Adapter</div>
-                  <div style="font-weight:500;">${data.run_info.finetuned_checkpoint}</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem;color:var(--color-text-muted);">Test Set Hash</div>
-                  <div style="font-family:monospace;font-size:0.8rem;">${data.dataset_hash.substring(0, 16)}...</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem;color:var(--color-text-muted);">Evaluated Date</div>
-                  <div style="font-weight:500;">${data.run_info.evaluated_at}</div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-
-      } catch (err) {
-        document.getElementById('metrics-body').innerHTML =
-          `<tr><td colspan="4" style="color:var(--color-danger);">Failed to load evaluation: ${err.message}</td></tr>`;
+        loadEvaluation();
       }
-    }
 
-    loadEvaluation();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
   </script>
 </body>
 </html>
