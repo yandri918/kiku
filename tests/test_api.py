@@ -70,6 +70,24 @@ def test_api_agenda_today(client):
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
+    assert len(data) > 0  # Seeded House 2 has 14 HST tasks
+
+
+def test_api_agenda_upcoming(client):
+    response = client.get("/api/agenda/upcoming")
+    assert response.status_code == 200
+    data = response.json()
+    assert "packing_dates" in data
+    assert "cutting_dates" in data
+    assert len(data["packing_dates"]) == 7
+    assert len(data["cutting_dates"]) == 7
+
+
+def test_api_agenda_export_csv(client):
+    response = client.get("/api/agenda/export/csv")
+    assert response.status_code == 200
+    assert "text/csv" in response.headers.get("content-type", "")
+    assert "Task ID,House,Activity" in response.text
 
 
 def test_note_extraction_and_approval_flow(client):

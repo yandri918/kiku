@@ -52,8 +52,62 @@
 
   <script src="/static/js/app.js"></script>
   <script>
+    const { API, activityLabel, statusBadge, formatDate } = window.KikuLog;
+
     document.getElementById('today-date').textContent =
       new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    async function loadTodayTasks() {
+      try {
+        const tasks = await API.get('/api/agenda/today');
+
+        const scheduledContainer = document.getElementById('scheduled-tasks');
+        const overdueContainer = document.getElementById('overdue-tasks');
+        const windowContainer = document.getElementById('window-tasks');
+
+        const overdue = tasks.filter(t => t.is_overdue);
+        const windows = tasks.filter(t => t.is_window);
+        const scheduled = tasks.filter(t => !t.is_overdue && !t.is_window);
+
+        function renderTaskItem(t) {
+          const dateStr = t.window_start === t.window_end
+            ? formatDate(t.window_start)
+            : `${formatDate(t.window_start)} – ${formatDate(t.window_end)}`;
+
+          return `
+            <div class="task-item">
+              <div>
+                <div class="task-activity">${activityLabel(t.activity)}</div>
+                <div class="task-meta">
+                  <strong>${t.house_name}</strong> &nbsp;|&nbsp;
+                  ${dateStr} &nbsp;|&nbsp;
+                  <span style="font-size:0.75rem;color:var(--color-text-muted);">${t.source}</span>
+                </div>
+              </div>
+              <div>${statusBadge(t.status)}</div>
+            </div>
+          `;
+        }
+
+        scheduledContainer.innerHTML = scheduled.length
+          ? scheduled.map(renderTaskItem).join('')
+          : '<p class="empty-state">No scheduled tasks for today.</p>';
+
+        overdueContainer.innerHTML = overdue.length
+          ? overdue.map(renderTaskItem).join('')
+          : '<p class="empty-state">No overdue tasks.</p>';
+
+        windowContainer.innerHTML = windows.length
+          ? windows.map(renderTaskItem).join('')
+          : '<p class="empty-state">No open windows today.</p>';
+
+      } catch (err) {
+        document.getElementById('scheduled-tasks').innerHTML =
+          `<p class="empty-state" style="color:var(--color-danger);">Failed to load agenda: ${err.message}</p>`;
+      }
+    }
+
+    loadTodayTasks();
   </script>
 </body>
 </html>
