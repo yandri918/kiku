@@ -3,8 +3,11 @@
 # Do not treat these as confirmed defaults.
 
 # Base model
-# List available models in your Tinker account before setting this.
-base_model: null  # e.g. "llama3-8b" — confirm availability first
+# Standard Tinker open-weight candidate models:
+# - "meta-llama/Llama-3.2-3B-Instruct" (fast & economical for task)
+# - "Qwen/Qwen2.5-7B-Instruct" (strong multilingual capability)
+# - "meta-llama/Meta-Llama-3.1-8B-Instruct"
+base_model: "meta-llama/Llama-3.2-3B-Instruct"
 
 # Data
 train_file: training/data/train.jsonl
